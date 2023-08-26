@@ -1,0 +1,28 @@
+package types
+
+const FormatDatetime = "2006-01-02 15:04:05"
+const FormatDate = "2006-01-02"
+const FormatTime = "15:04:05"
+const FormatYearMonth = "2006-01"
+const FormatYear = "2006"
+const FormatHourMinute = "15:04"
+const FormatHour = "15"
+
+const CURRENT_USER = "__CURRENT-USER__"
+
+const Original = "ORIGINAL"
+const Finished = "FINISHED"
+const Done = "DONE"
+const Undone = "UNDONE"
+const Fixed = "FIXED"
+const Fixing = "FIXING"
+const Checked = "CHECKED"
+const SpotChecked = "SPOT_CHECKED"
+const TransferOut = "TRANSFER_OUT"
+const Installed = "INSTALLED"
+const Installing = "INSTALLING"
+const TransferIn = "TRANSFER_IN"
+const Uninstalled = "UNINSTALLED"
+const UninstalledBreakdown = "UNINSTALLED_BREAKDOWN"
+const SendRepair = "SEND_REPAIR"
+const Scrap = "SCRAP"

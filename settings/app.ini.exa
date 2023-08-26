@@ -1,0 +1,43 @@
+[app]
+name = "rnv-mmq"
+paragraph-name = "rnv mini message queue"
+logo =
+production = true
+timezone = Asia/Shanghai
+default-limit = 1000
+[web-service]
+addr = ":8091"
+[tcp-server-service]
+enable = false
+addr = "0.0.0.0:8092"
+[tcp-client-service]
+enable = false
+addr = "127.0.0.1:8080"
+[rabbit-mq-service]
+enable = true
+addr = "127.0.0.1:5672"
+username = "admin"
+password = "zces@1234"
+vhost = "rnv-harbor-default-vhost"
+queue-name = "rnv-default-queue"
+[fix-workshop-project]
+root-url = "http://192.168.0.116:81"
+root-path = "/rnv/nginx/v1.23.1/html/fix-workshop"
+cycle-fix-plan-path = "storage/app/cycleFix"
+equipment-wiki-document-url-prefix = "storage/equipmentWikiDocument"
+[paragraph-names]
+"广州" = "B048"
+"长沙" = "B049"
+"怀化" = "B050"
+"衡阳" = "B051"
+"惠州" = "B052"
+"肇庆" = "B053"
+"海口" = "B074"
+[paragraph-unique-codes]
+"B048" = "广州"
+"B049" = "长沙"
+"B050" = "怀化"
+"B051" = "衡阳"
+"B052" = "惠州"
+"B053" = "肇庆"
+"B074" = "海口"
