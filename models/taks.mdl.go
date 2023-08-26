@@ -4,16 +4,14 @@ type (
 	// TaskModel 任务模型
 	TaskModel struct {
 		GormModel
-		Name             string               `gorm:"type:varchar(128);not null;default:'';comment:任务名称;" json:"name,omitempty"`
-		Target           string               `gorm:"type:varchar(128);not null;default:'';comment:任务目标;" json:"target,omitempty"`
-		Description      string               `gorm:"type:varchar(128);not null;default:'';comment:任务说明;" json:"description,omitempty"`
-		StatusCode       TaskModelStatusCodes `gorm:"type:enum('ORIGINAL','PROCESSING','FINISHED','FAILED','CANCEL');not null;default:'ORIGINAL';comment:任务状态码" json:"status_code,omitempty"`
-		StatusText       string               `gorm:"->;type:varchar(128) as ((case status_code when 'ORIGINAL' then '未执行' when 'PROCESSING' then '执行中' when 'FINISHED' then '已完成' when 'FAILED' then '失败' when 'CANCEL' then '已取消' else '' end));comment:任务状态文本" json:"status_text,omitempty"`
-		RequestFileUuid  string               `gorm:"index;type:char(36);not null;comment:所属请求文件uuid" json:"request_file_uuid,omitempty"`
-		RequestFile      *FileModel           `gorm:"foreignKey:request_file_uuid;references:uuid;comment:所属文件;" json:"request_file,omitempty"`
-		ResponseFileUuid string               `gorm:"index;type:char(36);not null;comment:所属响应文件uuid" json:"response_file_uuid,omitempty"`
-		ResponseFile     *FileModel           `gorm:"foreignKey:response_file_uuid;references:uuid;comment:所属响应文件;" json:"response_file,omitempty"`
-		TaskLogs         []*TaskLogModel      `gorm:"foreignKey:task_uuid;references:uuid;comment:相关任务日志;" json:"task_logs,omitempty"`
+		Name            string               `gorm:"type:varchar(128);not null;default:'';comment:任务名称;" json:"name,omitempty"`
+		Target          string               `gorm:"type:varchar(128);not null;default:'';comment:任务目标;" json:"target,omitempty"`
+		Description     string               `gorm:"type:varchar(128);not null;default:'';comment:任务说明;" json:"description,omitempty"`
+		StatusCode      TaskModelStatusCodes `gorm:"type:enum('ORIGINAL','PROCESSING','FINISHED','FAILED','CANCEL');not null;default:'ORIGINAL';comment:任务状态码" json:"status_code,omitempty"`
+		StatusText      string               `gorm:"->;type:varchar(128) as ((case status_code when 'ORIGINAL' then '未执行' when 'PROCESSING' then '执行中' when 'FINISHED' then '已完成' when 'FAILED' then '失败' when 'CANCEL' then '已取消' else '' end));comment:任务状态文本" json:"status_text,omitempty"`
+		RequestFileUuid string               `gorm:"index;type:char(36);not null;comment:所属请求文件uuid" json:"request_file_uuid,omitempty"`
+		RequestFile     *FileModel           `gorm:"foreignKey:request_file_uuid;references:uuid;comment:所属文件;" json:"request_file,omitempty"`
+		TaskLogs        []*TaskLogModel      `gorm:"foreignKey:task_uuid;references:uuid;comment:相关任务日志;" json:"task_logs,omitempty"`
 	}
 
 	// TaskModelStatusCodes 任务状态代码

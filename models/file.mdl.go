@@ -17,7 +17,6 @@ type (
 		FileType          FileType    `gorm:"type:varchar(128);not null;default:'';comment:文件类型" json:"file_type,omitempty"`
 		PrefixPath        string      `gorm:"type:varchar(128);not null;default:'';comment:文件前缀路径" json:"prefix_path,omitempty"`
 		TasksForRequest   []TaskModel `gorm:"foreignKey:request_file_uuid;references:uuid;comment:相关任务（请求）" json:"tasks_for_request,omitempty"`
-		TasksForResponse  []TaskModel `gorm:"foreignKey:response_file_uuid;references:uuid;comment:相关任务（响应）" json:"tasks_for_response,omitempty"`
 		Content           string      `gorm:"-"`
 		Url               string      `gorm:"-"`
 	}

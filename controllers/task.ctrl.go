@@ -252,7 +252,7 @@ func (TaskController) PostProcess(ctx *gin.Context) {
 }
 
 // PostFinish 标记完成
-func (receiver TaskController) PostFinish(ctx *gin.Context) {
+func (TaskController) PostFinish(ctx *gin.Context) {
 	var (
 		task       *models.TaskModel
 		ret        *gorm.DB
@@ -287,7 +287,7 @@ func (receiver TaskController) PostFinish(ctx *gin.Context) {
 }
 
 // PostFail 标记失败
-func (receiver TaskController) PostFail(ctx *gin.Context) {
+func (TaskController) PostFail(ctx *gin.Context) {
 	var (
 		task     *models.TaskModel
 		ret      *gorm.DB
