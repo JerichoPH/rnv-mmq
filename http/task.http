@@ -1,10 +1,31 @@
-POST http://{{host-api}}/task/f6fb549c-4c06-468b-a75e-dff136d01381/cancel
+POST {{host-api}}/task/f6fb549c-4c06-468b-a75e-dff136d01381/cancel
 Content-Type: application/json
 Authorization: JWT {{auth-token}}
 
 {}
 
-### 取消任务
+### 标记取消
+POST {{host-api}}/task/f6fb549c-4c06-468b-a75e-dff136d01381/fail
+Content-Type: application/json
+Authorization: JWT {{auth-token}}
+
+{}
+
+### 标记失败
+POST {{host-api}}/task/f6fb549c-4c06-468b-a75e-dff136d01381/finish
+Content-Type: application/json
+Authorization: JWT {{auth-token}}
+
+{}
+
+### 标记完成
+POST {{host-api}}/task/f6fb549c-4c06-468b-a75e-dff136d01381/process
+Content-Type: application/json
+Authorization: JWT {{auth-token}}
+
+{}
+
+### 标记执行
 PUT {{host-api}}/task/f6fb549c-4c06-468b-a75e-dff136d01381
 Content-Type: application/json
 Authorization: JWT {{auth-token}}
