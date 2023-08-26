@@ -7,7 +7,6 @@ import (
 	"rnv-mmq/models"
 	"rnv-mmq/services"
 	"rnv-mmq/tools"
-	"rnv-mmq/types"
 	"rnv-mmq/wrongs"
 )
 
@@ -92,7 +91,7 @@ func (TaskController) Store(ctx *gin.Context) {
 		wrongs.ThrowForbidden(ret.Error.Error())
 	}
 
-	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Created(types.MapStringToAny{"tasks": tasks}).ToGinResponse())
+	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Created(map[string]any{"tasks": tasks}).ToGinResponse())
 }
 
 // Delete 删除
@@ -158,7 +157,7 @@ func (TaskController) Update(ctx *gin.Context) {
 		wrongs.ThrowForbidden(ret.Error.Error())
 	}
 
-	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Updated(types.MapStringToAny{"task": task}).ToGinResponse())
+	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Updated(map[string]any{"task": task}).ToGinResponse())
 }
 
 // Detail 详情
@@ -175,7 +174,7 @@ func (TaskController) Detail(ctx *gin.Context) {
 		First(&task)
 	wrongs.ThrowWhenIsEmpty(ret, "任务")
 
-	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Datum(types.MapStringToAny{"task": task}).ToGinResponse())
+	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Datum(map[string]any{"task": task}).ToGinResponse())
 }
 
 func (TaskController) listUseQuery(ctx *gin.Context) *gorm.DB {
@@ -190,9 +189,9 @@ func (receiver TaskController) List(ctx *gin.Context) {
 		tools.NewCorrectWithGinContext("", ctx).
 			DataForPager(
 				receiver.listUseQuery(ctx),
-				func(db *gorm.DB) map[string]interface{} {
+				func(db *gorm.DB) map[string]any {
 					db.Find(&tasks)
-					return types.MapStringToAny{"tasks": tasks}
+					return map[string]any{"tasks": tasks}
 				},
 			).
 			ToGinResponse(),
@@ -207,9 +206,9 @@ func (receiver TaskController) ListJdt(ctx *gin.Context) {
 		tools.NewCorrectWithGinContext("", ctx).
 			DataForJqueryDataTable(
 				receiver.listUseQuery(ctx),
-				func(db *gorm.DB) map[string]interface{} {
+				func(db *gorm.DB) map[string]any {
 					db.Find(&tasks)
-					return types.MapStringToAny{"tasks": tasks}
+					return map[string]any{"tasks": tasks}
 				},
 			).
 			ToGinResponse(),

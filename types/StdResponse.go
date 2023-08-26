@@ -17,8 +17,8 @@ type StdResponse struct {
 }
 
 // ToMap 转map
-func (receiver StdResponse) ToMap() MapStringToAny {
-	return MapStringToAny{
+func (receiver StdResponse) ToMap() map[string]any {
+	return map[string]any{
 		"message_id":    receiver.MessageId,
 		"trace_id":      receiver.TraceId,
 		"msg":           receiver.Msg,
@@ -45,7 +45,7 @@ func (receiver StdResponse) ToJsonStr() string {
 	return string(receiver.ToJson())
 }
 
-// ToGinResponse 转gin响应格式 int+map[string]interface{}
-func (receiver StdResponse) ToGinResponse() (int, MapStringToAny) {
+// ToGinResponse 转gin响应格式 int+map[string]any
+func (receiver StdResponse) ToGinResponse() (int, map[string]any) {
 	return receiver.Status, receiver.ToMap()
 }

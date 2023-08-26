@@ -83,7 +83,7 @@ func handleConnection(conn net.Conn) {
 	}()
 
 	newUuid := uuid.NewV4().String()
-	_, err := io.WriteString(conn, tools.NewCorrectWithBusiness("链接成功", "connection-success", "").Datum(types.MapStringToAny{"uuid": newUuid}).ToJsonStr())
+	_, err := io.WriteString(conn, tools.NewCorrectWithBusiness("链接成功", "connection-success", "").Datum(map[string]any{"uuid": newUuid}).ToJsonStr())
 	tcpUuidToAddrDict[newUuid] = conn.RemoteAddr().String()
 	tcpAddrToUuidDict[conn.RemoteAddr().String()] = newUuid
 
@@ -103,7 +103,7 @@ func handleConnection(conn net.Conn) {
 		if err != nil {
 			log.Printf("[tcp-server-error] [解析业务失败] %s\n", message)
 
-			TcpServerSendMessageByAddr(wrongs.NewInCorrectWithBusniess("error").Error("业务解析失败", types.MapStringToAny{"request_content": message}).ToJsonStr(), conn.RemoteAddr().String())
+			TcpServerSendMessageByAddr(wrongs.NewInCorrectWithBusniess("error").Error("业务解析失败", map[string]any{"request_content": message}).ToJsonStr(), conn.RemoteAddr().String())
 		}
 
 		log.Printf("[tcp-server-debug] [接收客户端消息] %s %v\n", conn.RemoteAddr().String(), business)
@@ -112,14 +112,14 @@ func handleConnection(conn net.Conn) {
 		case "ping":
 			log.Printf("[tcp-server-debug] [%s] %s\n", business.BusinessType, message)
 
-			TcpServerSendMessageByAddr(tools.NewCorrectWithBusiness("pong", "pong", "").Datum(types.MapStringToAny{"time": time.Now().Unix()}).ToJsonStr(), conn.RemoteAddr().String())
+			TcpServerSendMessageByAddr(tools.NewCorrectWithBusiness("pong", "pong", "").Datum(map[string]any{"time": time.Now().Unix()}).ToJsonStr(), conn.RemoteAddr().String())
 		case "authorization/bindUserUuid":
 			log.Printf("[tcp-server-debug] [%s] 绑定用户uuid\n", business.BusinessType)
 
 			tcpAddrToUuidDict[conn.RemoteAddr().String()] = business.Content["uuid"].(string)
 			tcpUuidToAddrDict[business.Content["uuid"].(string)] = conn.RemoteAddr().String()
 
-			TcpServerSendMessageByAddr(tools.NewCorrectWithBusiness("绑定成功", business.BusinessType, "").Datum(types.MapStringToAny{}).ToJsonStr(), conn.RemoteAddr().String())
+			TcpServerSendMessageByAddr(tools.NewCorrectWithBusiness("绑定成功", business.BusinessType, "").Datum(map[string]any{}).ToJsonStr(), conn.RemoteAddr().String())
 		}
 	}
 }

@@ -3,7 +3,6 @@ package models
 import (
 	"fmt"
 	"rnv-mmq/database"
-	"rnv-mmq/types"
 	"rnv-mmq/wrongs"
 	"strconv"
 	"strings"
@@ -25,26 +24,26 @@ type GormModel struct {
 	Uuid                     string         `gorm:"unique;type:char(36);comment:uuid;" json:"uuid"`
 	Sort                     int64          `gorm:"type:bigint;default:0;comment:排序;" json:"sort"`
 	ctx                      *gin.Context
-	preloads                 types.ListString
-	selects                  types.ListString
-	omits                    types.ListString
-	whereFields              types.ListString
-	notWhereFields           types.ListString
-	orWhereFields            types.ListString
-	ignoreFields             types.ListString
-	distinctFieldNames       types.ListString
-	wheres                   types.MapStringToAny
-	notWheres                types.MapStringToAny
-	orWheres                 types.MapStringToAny
+	preloads                 []string
+	selects                  []string
+	omits                    []string
+	whereFields              []string
+	notWhereFields           []string
+	orWhereFields            []string
+	ignoreFields             []string
+	distinctFieldNames       []string
+	wheres                   map[string]any
+	notWheres                map[string]any
+	orWheres                 map[string]any
 	wheresExtra              map[string]func(string, *gorm.DB) *gorm.DB
 	wheresExtraExist         map[string]func(string, *gorm.DB) *gorm.DB
-	wheresExtraExists        map[string]func(types.ListString, *gorm.DB) *gorm.DB
+	wheresExtraExists        map[string]func([]string, *gorm.DB) *gorm.DB
 	scopes                   []func(*gorm.DB) *gorm.DB
-	whereDateBetween         types.ListString
-	whereDatetimeBetween     types.ListString
-	whereBetween             types.ListString
-	whereIntBetween          types.ListString
-	whereFloatBetween        types.ListString
+	whereDateBetween         []string
+	whereDatetimeBetween     []string
+	whereBetween             []string
+	whereIntBetween          []string
+	whereFloatBetween        []string
 	whereIn                  map[string]string
 	whereFuzzyQueryCondition map[string]string
 	model                    interface{}
@@ -60,8 +59,8 @@ func (receiver *GormModel) demoFindOne() {
 	var b GormModel
 	ret := receiver.
 		SetModel(GormModel{}).
-		SetWheres(types.MapStringToAny{}).
-		SetNotWheres(types.MapStringToAny{}).
+		SetWheres(map[string]any{}).
+		SetNotWheres(map[string]any{}).
 		GetDb("").
 		First(b)
 	wrongs.ThrowWhenIsEmpty(ret, "XX")
@@ -125,7 +124,7 @@ func (receiver *GormModel) SetPreloads(preloads ...string) *GormModel {
 
 // SetPreloadsByDefault 设置Preloads为默认
 func (receiver *GormModel) SetPreloadsByDefault() *GormModel {
-	receiver.preloads = types.ListString{clause.Associations}
+	receiver.preloads = []string{clause.Associations}
 	return receiver
 }
 
@@ -166,19 +165,19 @@ func (receiver *GormModel) SetIgnoreFields(ignoreFields ...string) *GormModel {
 }
 
 // SetWheres 通过Map设置Wheres
-func (receiver *GormModel) SetWheres(wheres types.MapStringToAny) *GormModel {
+func (receiver *GormModel) SetWheres(wheres map[string]any) *GormModel {
 	receiver.wheres = wheres
 	return receiver
 }
 
 // SetNotWheres 设置NotWheres
-func (receiver *GormModel) SetNotWheres(notWheres types.MapStringToAny) *GormModel {
+func (receiver *GormModel) SetNotWheres(notWheres map[string]any) *GormModel {
 	receiver.notWheres = notWheres
 	return receiver
 }
 
 // SetOrWheres 设置Or条件
-func (receiver *GormModel) SetOrWheres(orWheres types.MapStringToAny) *GormModel {
+func (receiver *GormModel) SetOrWheres(orWheres map[string]any) *GormModel {
 	receiver.orWheres = orWheres
 	return receiver
 }
@@ -204,7 +203,7 @@ func (receiver *GormModel) SetWheresExtraExist(wheresExtraExist map[string]func(
 }
 
 // SetWheresExtraExists 当Query参数存在时设置额外搜索条件（多个条件）
-func (receiver *GormModel) SetWheresExtraExists(wheresExtraExists map[string]func(types.ListString, *gorm.DB) *gorm.DB) *GormModel {
+func (receiver *GormModel) SetWheresExtraExists(wheresExtraExists map[string]func([]string, *gorm.DB) *gorm.DB) *GormModel {
 	receiver.wheresExtraExists = wheresExtraExists
 
 	return receiver
@@ -317,9 +316,9 @@ func (receiver *GormModel) GetDb(dbConnName string) (query *gorm.DB) {
 func (receiver *GormModel) GetDbUseQuery(dbConnName string) *gorm.DB {
 	dbSession := receiver.GetDb(dbConnName)
 
-	wheres := make(types.MapStringToAny)
-	notWheres := make(types.MapStringToAny)
-	orWheres := make(types.MapStringToAny)
+	wheres := make(map[string]any)
+	notWheres := make(map[string]any)
+	orWheres := make(map[string]any)
 
 	// 自动化处理⬇
 

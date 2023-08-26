@@ -4,7 +4,6 @@ import (
 	"rnv-mmq/models"
 	"rnv-mmq/services"
 	"rnv-mmq/tools"
-	"rnv-mmq/types"
 	"rnv-mmq/wrongs"
 
 	"github.com/gin-gonic/gin"
@@ -47,7 +46,7 @@ func (UserController) Store(ctx *gin.Context) {
 		wrongs.ThrowForbidden(ret.Error.Error())
 	}
 
-	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Created(types.MapStringToAny{"user": user}).ToGinResponse())
+	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Created(map[string]any{"user": user}).ToGinResponse())
 }
 
 // Delete 删除
@@ -59,7 +58,7 @@ func (UserController) Delete(ctx *gin.Context) {
 
 	// 查询
 	ret = models.NewGorm().SetModel(models.UserModel{}).
-		SetWheres(types.MapStringToAny{"uuid": ctx.Param("uuid")}).
+		SetWheres(map[string]any{"uuid": ctx.Param("uuid")}).
 		GetDb("").
 		First(&user)
 	wrongs.ThrowWhenIsEmpty(ret, "用户")
@@ -85,7 +84,7 @@ func (UserController) Update(ctx *gin.Context) {
 
 	// 查询
 	ret = models.NewGorm().SetModel(models.UserModel{}).
-		SetWheres(types.MapStringToAny{"uuid": ctx.Param("uuid")}).
+		SetWheres(map[string]any{"uuid": ctx.Param("uuid")}).
 		GetDb("").
 		First(&user)
 	wrongs.ThrowWhenIsEmpty(ret, "用户")
@@ -98,7 +97,7 @@ func (UserController) Update(ctx *gin.Context) {
 		wrongs.ThrowForbidden(ret.Error.Error())
 	}
 
-	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Updated(types.MapStringToAny{"user": user}).ToGinResponse())
+	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Updated(map[string]any{"user": user}).ToGinResponse())
 }
 
 // Detail 详情
@@ -108,12 +107,12 @@ func (UserController) Detail(ctx *gin.Context) {
 		user models.UserModel
 	)
 	ret = models.NewGorm().SetModel(models.UserModel{}).
-		SetWheres(types.MapStringToAny{"uuid": ctx.Param("uuid")}).
+		SetWheres(map[string]any{"uuid": ctx.Param("uuid")}).
 		GetDb("").
 		First(&user)
 	wrongs.ThrowWhenIsEmpty(ret, "用户")
 
-	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Datum(types.MapStringToAny{"user": user}).ToGinResponse())
+	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Datum(map[string]any{"user": user}).ToGinResponse())
 }
 
 func (UserController) listByQuery(ctx *gin.Context) *gorm.DB {
@@ -128,9 +127,9 @@ func (receiver UserController) List(ctx *gin.Context) {
 		tools.NewCorrectWithGinContext("", ctx).
 			DataForPager(
 				receiver.listByQuery(ctx),
-				func(db *gorm.DB) types.MapStringToAny {
+				func(db *gorm.DB) map[string]any {
 					db.Find(&users)
-					return types.MapStringToAny{"users": users}
+					return map[string]any{"users": users}
 				},
 			).ToGinResponse(),
 	)
@@ -144,9 +143,9 @@ func (receiver UserController) ListJdt(ctx *gin.Context) {
 		tools.NewCorrectWithGinContext("", ctx).
 			DataForJqueryDataTable(
 				receiver.listByQuery(ctx),
-				func(db *gorm.DB) types.MapStringToAny {
+				func(db *gorm.DB) map[string]any {
 					db.Find(&users)
-					return types.MapStringToAny{"users": users}
+					return map[string]any{"users": users}
 				},
 			).ToGinResponse(),
 	)

@@ -109,9 +109,9 @@ func bootAutoMigrate(dst ...interface{}) {
 }
 
 // 执行command命令
-func launchCommand(commandName string, commandParams, tmp types.ListString, daemon bool) {
+func launchCommand(commandName string, commandParams, tmp []string, daemon bool) {
 	var (
-		commandResults types.ListString
+		commandResults []string
 		commandSetting WebServiceCommandSetting
 		appSetting     *ini.File = settings.NewSetting().App
 		appName        string    = appSetting.Section("app").Key("name").String()
@@ -199,7 +199,7 @@ func main() {
 	// t='web-service' 启动web服务 可选项-port=8080 端口号、-daemon=false 守护进程
 	var (
 		title, commandName string
-		commandParams, tmp types.ListString
+		commandParams, tmp []string
 		daemon             bool
 	)
 	flag.StringVar(&title, "t", "", "命令终端参数")
@@ -207,7 +207,7 @@ func main() {
 	flag.Parse()
 
 	commandName = ""
-	commandParams = make(types.ListString, 0)
+	commandParams = make([]string, 0)
 
 	if title != "" {
 		tmp = strings.Split(title, " ")

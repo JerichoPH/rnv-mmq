@@ -3,7 +3,6 @@ package tools
 import (
 	"fmt"
 	"net/url"
-	"rnv-mmq/types"
 	"rnv-mmq/wrongs"
 
 	"github.com/gin-gonic/gin"
@@ -383,7 +382,7 @@ func (receiver *ExcelWriter) AddRow(excelRow *ExcelRow) *ExcelWriter {
 }
 
 // SetTitleRow 设置标题行
-func (receiver *ExcelWriter) SetTitleRow(titles types.ListString, rowNumber uint64) *ExcelWriter {
+func (receiver *ExcelWriter) SetTitleRow(titles []string, rowNumber uint64) *ExcelWriter {
 	var (
 		titleRow   *ExcelRow
 		titleCells = make([]*ExcelCell, len(titles))

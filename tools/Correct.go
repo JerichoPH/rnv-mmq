@@ -99,7 +99,7 @@ func (receiver correct) Blank() types.StdResponse {
 }
 
 // DataForPager 返回分页数据
-func (receiver correct) DataForPager(db *gorm.DB, read func(*gorm.DB) types.MapStringToAny) types.StdResponse {
+func (receiver correct) DataForPager(db *gorm.DB, read func(*gorm.DB) map[string]any) types.StdResponse {
 	var count int64
 
 	if receiver.msg == "" {
@@ -121,7 +121,7 @@ func (receiver correct) DataForPager(db *gorm.DB, read func(*gorm.DB) types.MapS
 			Content:   read(db.Offset((page - 1) * limit).Limit(limit)),
 			Status:    200,
 			ErrorCode: 0,
-			Pagination: map[string]interface{}{
+			Pagination: map[string]any{
 				"page_curr": page,
 				"page_last": math.Ceil(float64(count/int64(limit))) + 1,
 				"page_prev": page - 1,
@@ -157,7 +157,7 @@ func (receiver correct) DataForPager(db *gorm.DB, read func(*gorm.DB) types.MapS
 }
 
 // DataForJqueryDataTable 返回jquery-dataTable格式分页数据
-func (receiver correct) DataForJqueryDataTable(db *gorm.DB, read func(*gorm.DB) types.MapStringToAny) types.JqueryDataTableResponse {
+func (receiver correct) DataForJqueryDataTable(db *gorm.DB, read func(*gorm.DB) map[string]any) types.JqueryDataTableResponse {
 	var count int64
 
 	if receiver.msg == "" {

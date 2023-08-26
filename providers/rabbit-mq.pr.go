@@ -108,7 +108,7 @@ func RabbitMqHandler(rabbitMqUsername, rabbitMqPassword, rabbitMqAddr, rabbitMqV
 			switch business.BusinessType {
 			case "ping":
 				log.Printf("[rabbit-mq-debug] [ping]")
-				// RabbitMqSendMessage(tools.NewCorrectWithBusiness("pong", "pong").Datum(types.MapStringToAny{"time": time.Now().Unix()}).ToJsonStr())
+				// RabbitMqSendMessage(tools.NewCorrectWithBusiness("pong", "pong").Datum(map[string]any{"time": time.Now().Unix()}).ToJsonStr())
 			}
 		}
 	}()

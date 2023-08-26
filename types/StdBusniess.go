@@ -7,16 +7,16 @@ import (
 type (
 	// StdBusiness tcp服务器端、tcp客户端、websocket业务消息格式
 	StdBusiness struct {
-		MessageId    string                 `json:"message_id"`
-		TraceId      string                 `json:"trace_id"`
-		BusinessType string                 `json:"business_type"`
-		Content      map[string]interface{} `json:"content"`
+		MessageId    string         `json:"message_id"`
+		TraceId      string         `json:"trace_id"`
+		BusinessType string         `json:"business_type"`
+		Content      map[string]any `json:"content"`
 	}
 )
 
 // ToMap 转map
-func (receiver StdBusiness) ToMap() MapStringToAny {
-	return MapStringToAny{
+func (receiver StdBusiness) ToMap() map[string]any {
+	return map[string]any{
 		"message_id":    receiver.MessageId,
 		"trace_id":      receiver.TraceId,
 		"content":       receiver.Content,

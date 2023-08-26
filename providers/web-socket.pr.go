@@ -106,7 +106,7 @@ func WebsocketHandler(ctx *gin.Context) {
 		if err != nil {
 			log.Printf("[websocket-error] [解析业务失败] %s\n", message)
 
-			WebsocketSendMessageByAddr(wrongs.NewInCorrectWithBusniess("error").Error("业务解析失败", types.MapStringToAny{"request_content": message}).ToJsonStr(), ws.RemoteAddr().String())
+			WebsocketSendMessageByAddr(wrongs.NewInCorrectWithBusniess("error").Error("业务解析失败", map[string]any{"request_content": message}).ToJsonStr(), ws.RemoteAddr().String())
 		}
 
 		switch business.BusinessType {
@@ -115,7 +115,7 @@ func WebsocketHandler(ctx *gin.Context) {
 			WebsocketSendMessageByAddr(tools.NewCorrectWithBusiness("echo", "echo", "").Datum(business.Content).ToJsonStr(), ws.RemoteAddr().String())
 		case "ping":
 			// log.Printf("[websocket-debug] [%s] %s\n", business.BusinessType, message)
-			WebsocketSendMessageByAddr(tools.NewCorrectWithBusiness("pong", "pong", "").Datum(types.MapStringToAny{"time": time.Now().Unix()}).ToJsonStr(), ws.RemoteAddr().String())
+			WebsocketSendMessageByAddr(tools.NewCorrectWithBusiness("pong", "pong", "").Datum(map[string]any{"time": time.Now().Unix()}).ToJsonStr(), ws.RemoteAddr().String())
 		case "authorization/bindUserUuid":
 			log.Printf("[websocket-debug] [%s] 绑定用户uuid %s %s %v\n", business.BusinessType, business.Content["uuid"], ws.RemoteAddr().String(), websocketClients)
 
@@ -124,7 +124,7 @@ func WebsocketHandler(ctx *gin.Context) {
 
 			log.Printf("[websocket-debug] [%s] 绑定用户uuid成功 %s %s %v %v\n", business.BusinessType, business.Content["uuid"], ws.RemoteAddr().String(), websocketClients, websocketUuidToAddrDict)
 
-			WebsocketSendMessageByAddr(tools.NewCorrectWithBusiness("绑定成功", business.BusinessType, "").Datum(types.MapStringToAny{}).ToJsonStr(), ws.RemoteAddr().String())
+			WebsocketSendMessageByAddr(tools.NewCorrectWithBusiness("绑定成功", business.BusinessType, "").Datum(map[string]any{}).ToJsonStr(), ws.RemoteAddr().String())
 		}
 	}
 }

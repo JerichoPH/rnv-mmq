@@ -2,34 +2,6 @@ package types
 
 import "reflect"
 
-type MapStringToAny = map[string]any
-type MapStringToString = map[string]string
-type MapStringToFloat32 = map[string]float32
-type MapStringToFloat64 = map[string]float64
-type MapStringToUint8 = map[string]uint8
-type MapStringToUint32 = map[string]uint32
-type MapStringToUint64 = map[string]uint64
-type MapStringToUint = map[string]uint
-type MapStringToInt8 = map[string]int8
-type MapStringToInt32 = map[string]int32
-type MapStringToInt64 = map[string]int64
-type MapStringToInt = map[string]int
-type MapStringToBool = map[string]bool
-type ListString = []string
-type ListInt = []int
-type ListInt8 = []int8
-type ListInt16 = []int16
-type ListInt32 = []int32
-type ListInt64 = []int64
-type ListUint = []uint
-type ListUint8 = []uint8
-type ListUint16 = []uint16
-type ListUint32 = []uint32
-type ListUint64 = []uint64
-type ListFloat32 = []float32
-type ListFloat64 = []float64
-type ListAny = []any
-
 // IsString 判断是否是字符串类型
 func IsString(value any) bool {
 	return reflect.TypeOf(value).Kind() == reflect.String
@@ -127,8 +99,8 @@ func IsEmptyStruct(value, typeMode any) any {
 type MapString struct{}
 
 // GetKeys 获取字符串字典所有key
-func (receiver MapString) GetKeys(value MapStringToAny) ListString {
-	var keys = make(ListString, 0)
+func (receiver MapString) GetKeys(value map[string]any) []string {
+	var keys = make([]string, 0)
 
 	for key := range value {
 		keys = append(keys, key)

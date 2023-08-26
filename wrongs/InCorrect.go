@@ -90,7 +90,7 @@ func (receiver inCorrect) Validate(msg string, content any) types.StdResponse {
 	}
 }
 
-func (receiver inCorrect) Error(msg string, content types.MapStringToAny) types.StdResponse {
+func (receiver inCorrect) Error(msg string, content map[string]any) types.StdResponse {
 	if msg == "" {
 		msg = "错误"
 	}

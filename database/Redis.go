@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"rnv-mmq/settings"
-	"rnv-mmq/types"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -70,7 +69,7 @@ func (receiver Redis) GetValue(key string) (any, error) {
 }
 
 // Sort 排序获取值
-func (receiver Redis) Sort(key string, offset, count int64, order string) (types.ListString, error) {
+func (receiver Redis) Sort(key string, offset, count int64, order string) ([]string, error) {
 	values, err := receiver.Client.Sort(context.Background(), key, &redis.Sort{Offset: offset, Count: count, Order: order}).Result()
 	return values, err
 }
@@ -88,7 +87,7 @@ func (receiver Redis) ZRange(key, min, max string, offset, count int64) ([]redis
 }
 
 // ZInterStore
-func (receiver Redis) ZInterStore(keys types.ListString, weights types.ListFloat64) (int64, error) {
+func (receiver Redis) ZInterStore(keys []string, weights []float64) (int64, error) {
 	values, err := receiver.Client.ZInterStore(context.Background(), "out", &redis.ZStore{
 		Keys:    keys,
 		Weights: weights,

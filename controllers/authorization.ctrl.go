@@ -8,7 +8,6 @@ import (
 	"gorm.io/gorm/clause"
 	"rnv-mmq/models"
 	"rnv-mmq/tools"
-	"rnv-mmq/types"
 	"rnv-mmq/wrongs"
 )
 
@@ -90,12 +89,12 @@ func (AuthorizationController) Register(ctx *gin.Context) {
 	var repeat models.UserModel
 	var ret *gorm.DB
 	ret = (&models.GormModel{}).
-		SetWheres(types.MapStringToAny{"username": form.Username}).
+		SetWheres(map[string]any{"username": form.Username}).
 		GetDb("").
 		First(&repeat)
 	wrongs.ThrowWhenIsRepeat(ret, "用户名")
 	ret = (&models.GormModel{}).
-		SetWheres(types.MapStringToAny{"nickname": form.Nickname}).
+		SetWheres(map[string]any{"nickname": form.Nickname}).
 		GetDb("").
 		First(&repeat)
 	wrongs.ThrowWhenIsRepeat(ret, "昵称")
@@ -117,7 +116,7 @@ func (AuthorizationController) Register(ctx *gin.Context) {
 		wrongs.ThrowForbidden("注册失败：" + ret.Error.Error())
 	}
 
-	ctx.JSON(tools.NewCorrectWithGinContext("注册成功", ctx).Created(types.MapStringToAny{"uuid": user.Uuid}).ToGinResponse())
+	ctx.JSON(tools.NewCorrectWithGinContext("注册成功", ctx).Created(map[string]any{"uuid": user.Uuid}).ToGinResponse())
 }
 
 // Login 登录
@@ -132,7 +131,7 @@ func (AuthorizationController) Login(ctx *gin.Context) {
 	// 获取用户
 	ret = models.NewGorm().
 		SetModel(models.UserModel{}).
-		SetWheres(types.MapStringToAny{"username": form.Username}).
+		SetWheres(map[string]any{"username": form.Username}).
 		GetDb("").
 		First(&user)
 	wrongs.ThrowWhenIsEmpty(ret, "用户")
@@ -150,9 +149,9 @@ func (AuthorizationController) Login(ctx *gin.Context) {
 		// 生成jwt错误
 		wrongs.ThrowForbidden(err.Error())
 	} else {
-		ctx.JSON(tools.NewCorrectWithGinContext("登陆成功", ctx).Datum(types.MapStringToAny{
+		ctx.JSON(tools.NewCorrectWithGinContext("登陆成功", ctx).Datum(map[string]any{
 			"token": token,
-			"user": types.MapStringToAny{
+			"user": map[string]any{
 				"nickname": user.Nickname,
 				"uuid":     user.Uuid,
 			},
@@ -169,7 +168,7 @@ func (AuthorizationController) Login(ctx *gin.Context) {
 //		// 获取当前用户信息
 //		var account models.UserModel
 //		ret = models.NewGorm().SetModel(models.UserModel{}).
-//			SetWheres(types.MapStringToAny{"uuid": accountUuid}).
+//			SetWheres(map[string]any{"uuid": accountUuid}).
 //			SetPreloads("RbacRoles", "RbacRoles.Menus").
 //			GetDb("",nil).
 //			FindOneUseQuery(&account)
@@ -192,6 +191,6 @@ func (AuthorizationController) Login(ctx *gin.Context) {
 //			Preload("Subs").
 //			Find(&menus)
 //
-//		ctx.JSON(tools.CorrectInit("", ctx).Datum(types.MapStringToAny{"menus": menus}))
+//		ctx.JSON(tools.CorrectInit("", ctx).Datum(map[string]any{"menus": menus}))
 //	}
 // }

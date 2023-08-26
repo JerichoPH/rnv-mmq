@@ -7,7 +7,6 @@ import (
 
 	"rnv-mmq/database"
 	"rnv-mmq/tools"
-	"rnv-mmq/types"
 	"rnv-mmq/wrongs"
 
 	"github.com/gosuri/uiprogress"
@@ -23,22 +22,22 @@ func NewTestCommand() *TestCommand {
 	return &TestCommand{}
 }
 
-func (receiver TestCommand) uuid() types.ListString {
+func (receiver TestCommand) uuid() []string {
 	c := make(chan string)
 	go func(c chan string) {
 		uuidStr := uuid.NewV4().String()
 		c <- uuidStr
 	}(c)
 	go tools.NewTimer(5).Ticker()
-	return types.ListString{<-c}
+	return []string{<-c}
 }
 
-func (receiver TestCommand) ls() types.ListString {
+func (receiver TestCommand) ls() []string {
 	_, res := (&tools.Cmd{}).Process("ls", "-la")
-	return types.ListString{res}
+	return []string{res}
 }
 
-func (receiver TestCommand) redis() types.ListString {
+func (receiver TestCommand) redis() []string {
 	if _, err := database.NewRedis(0).SetValue("test", "AAA", 15*time.Minute); err != nil {
 		wrongs.ThrowForbidden(err.Error())
 	}
@@ -51,10 +50,10 @@ func (receiver TestCommand) redis() types.ListString {
 		}
 	}
 
-	return types.ListString{""}
+	return []string{""}
 }
 
-func (receiver TestCommand) uiProcesses() types.ListString {
+func (receiver TestCommand) uiProcesses() []string {
 	bar := progressbar.Default(100)
 	for i := 0; i < 100; i++ {
 		err := bar.Add(1)
@@ -64,10 +63,10 @@ func (receiver TestCommand) uiProcesses() types.ListString {
 		time.Sleep(50 * time.Millisecond)
 	}
 
-	return types.ListString{}
+	return []string{}
 }
 
-func (receiver TestCommand) uiProcesses2() types.ListString {
+func (receiver TestCommand) uiProcesses2() []string {
 	uiprogress.Start()
 	bar := uiprogress.AddBar(100).AppendCompleted().PrependElapsed()
 	for i := 0; i < 100; i++ {
@@ -76,7 +75,7 @@ func (receiver TestCommand) uiProcesses2() types.ListString {
 	}
 	uiprogress.Stop()
 
-	return types.ListString{}
+	return []string{}
 }
 
 func worker(ctx context.Context, done chan bool) {
@@ -93,7 +92,7 @@ func worker(ctx context.Context, done chan bool) {
 	done <- true
 }
 
-func (receiver TestCommand) timeout() types.ListString {
+func (receiver TestCommand) timeout() []string {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -107,7 +106,7 @@ func (receiver TestCommand) timeout() types.ListString {
 		fmt.Println("Program stopped due to timeout")
 	}
 
-	return types.ListString{}
+	return []string{}
 }
 
 type (
@@ -152,7 +151,7 @@ type (
 )
 
 // Handle 执行命令
-func (receiver TestCommand) Handle(params types.ListString) types.ListString {
+func (receiver TestCommand) Handle(params []string) []string {
 	switch params[0] {
 	case "uuid":
 		return receiver.uuid()
@@ -167,6 +166,6 @@ func (receiver TestCommand) Handle(params types.ListString) types.ListString {
 	case "timeout":
 		return receiver.timeout()
 	default:
-		return types.ListString{"没有找到命令"}
+		return []string{"没有找到命令"}
 	}
 }

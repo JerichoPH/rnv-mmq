@@ -43,7 +43,7 @@ func timedHandler(duration time.Duration) func(c *gin.Context) {
 		// create the response data type to use as a channel type
 		type responseData struct {
 			status int
-			body   map[string]interface{}
+			body   map[string]any
 		}
 
 		// create a done channel to tell the request it's done

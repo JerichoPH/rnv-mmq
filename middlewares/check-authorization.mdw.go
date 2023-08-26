@@ -52,7 +52,7 @@ func CheckAuthorization() gin.HandlerFunc {
 				ret = models.NewGorm().SetModel(models.UserModel{}).GetDb("").Where("uuid", claims.Uuid).First(&user)
 				wrongs.ThrowWhenIsEmpty(ret, fmt.Sprintf("令牌指向用户(JWT) %s %v ", token, claims))
 			case "AU":
-				ret = models.NewGorm().SetModel(models.UserModel{}).SetWheres(types.MapStringToAny{"open_id": token}).GetDb("").First(&user)
+				ret = models.NewGorm().SetModel(models.UserModel{}).SetWheres(map[string]any{"open_id": token}).GetDb("").First(&user)
 				wrongs.ThrowWhenIsEmpty(ret, fmt.Sprintf("令牌指向用户(AU) %s", token))
 			default:
 				wrongs.ThrowForbidden("权鉴认证方式不支持")
