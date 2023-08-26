@@ -2,6 +2,7 @@ package apiRoute
 
 import (
 	"github.com/gin-gonic/gin"
+	"rnv-mmq/controllers"
 	"rnv-mmq/middlewares"
 )
 
@@ -9,34 +10,38 @@ import (
 type TaskRouter struct{}
 
 // NewTaskRouter 构造函数
-func NewTaskRouter() TaskRouter {
-	return TaskRouter{}
-}
+func NewTaskRouter() TaskRouter { return TaskRouter{} }
 
 // Load 加载路由
 func (TaskRouter) Load(engine *gin.Engine) {
-	r := engine.Group(
+	taskRoute := engine.Group(
 		"api/task",
 		middlewares.CheckAuthorization(),
 		// middlewares.CheckPermission(),
 	)
 	{
 		// 新建
-		r.POST("", controllers.New().Store)
-
+		taskRoute.POST("", controllers.NewTaskController().Store)
 		// 删除
-		r.DELETE("/:uuid", controllers.New().Delete)
-
+		taskRoute.DELETE("/:uuid", controllers.NewTaskController().Delete)
 		// 编辑
-		r.PUT("/:uuid", controllers.New().Update)
-
+		taskRoute.PUT("/:uuid", controllers.NewTaskController().Update)
 		// 详情
-		r.GET("/:uuid", controllers.New().Detail)
-
+		taskRoute.GET("/:uuid", controllers.NewTaskController().Detail)
 		// 列表
-		r.GET("", controllers.New().List)
-
+		taskRoute.GET("", controllers.NewTaskController().List)
 		// jquery-dataTable数据列表
-		r.GET(".jdt", controllers.New().ListJdt)
+		taskRoute.GET(".jdt", controllers.NewTaskController().ListJdt)
+	}
+
+	taskLogRoute := engine.Group(
+		"api/task-log",
+		middlewares.CheckAuthorization(),
+		// middlewares.CheckPermission(),
+	)
+	{
+		taskLogRoute.GET("", func(context *gin.Context) {
+			context.JSON(200, gin.H{"message": "task-log"})
+		})
 	}
 }

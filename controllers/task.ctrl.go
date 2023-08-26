@@ -43,6 +43,7 @@ func (receiver TaskStoreForm) ShouldBind(ctx *gin.Context) TaskStoreForm {
 	return receiver
 }
 
+// ShouldBind 绑定表单
 func (receiver TaskUpdateForm) ShouldBind(ctx *gin.Context) TaskUpdateForm {
 	if err := ctx.ShouldBind(&receiver); err != nil {
 		wrongs.ThrowValidate(err.Error())
