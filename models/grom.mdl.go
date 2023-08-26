@@ -18,11 +18,11 @@ import (
 
 // GormModel 基础模型
 type GormModel struct {
-	Id                       uint64         `gorm:"type:bigint unsigned;primaryKey;" json:"id"`
+	Id                       uint64         `gorm:"primarykey" json:"id"`
 	CreatedAt                time.Time      `gorm:"<-:create;type:datetime;default:CURRENT_TIMESTAMP;comment:创建时间;" json:"created_at,omitempty"`
 	UpdatedAt                time.Time      `gorm:"type:datetime;default:CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;comment:更新时间;" json:"updated_at,omitempty"`
 	DeletedAt                gorm.DeletedAt `gorm:"index;type:datetime" json:"deleted_at"`
-	Uuid                     string         `gorm:"type:char(36);unique;comment:uuid;" json:"uuid"`
+	Uuid                     string         `gorm:"unique;type:char(36);comment:uuid;" json:"uuid"`
 	Sort                     int64          `gorm:"type:bigint;default:0;comment:排序;" json:"sort"`
 	ctx                      *gin.Context
 	preloads                 types.ListString

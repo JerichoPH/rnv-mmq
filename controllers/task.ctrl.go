@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
+	"log"
 	"rnv-mmq/models"
 	"rnv-mmq/services"
 	"rnv-mmq/tools"
@@ -79,12 +80,13 @@ func (TaskController) Store(ctx *gin.Context) {
 	// 新建
 	tasks = make([]*models.TaskModel, len(form.Targets))
 	for idx, target := range form.Targets {
+		log.Println(target)
 		tasks[idx] = &models.TaskModel{
-			GormModel:   models.GormModel{Uuid: uuid.NewV4().String()},
-			Name:        form.Name,
-			Target:      target,
-			Description: form.Description,
-			StatusCode:  "ORIGINAL",
+			GormModel: models.GormModel{Uuid: uuid.NewV4().String()},
+			Name:      form.Name,
+			// Target:      target,
+			// Description: form.Description,
+			StatusCode: "ORIGINAL",
 		}
 	}
 	if ret = models.NewGorm().
@@ -144,8 +146,8 @@ func (TaskController) Update(ctx *gin.Context) {
 
 	// 编辑
 	task.Name = form.Name
-	task.Target = form.Target
-	task.Description = form.Description
+	// task.Target = form.Target
+	// task.Description = form.Description
 	if ret = models.NewGorm().
 		SetModel(models.TaskModel{}).
 		GetDb("").

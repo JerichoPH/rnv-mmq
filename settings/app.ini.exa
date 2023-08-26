@@ -6,13 +6,13 @@ production = true
 timezone = Asia/Shanghai
 default-limit = 1000
 [web-service]
-addr = ":8091"
+addr = ":18001"
 [tcp-server-service]
 enable = false
-addr = "0.0.0.0:8092"
+addr = "0.0.0.0:18002"
 [tcp-client-service]
 enable = false
-addr = "127.0.0.1:8080"
+addr = "127.0.0.1:18003"
 [rabbit-mq-service]
 enable = true
 addr = "127.0.0.1:5672"
