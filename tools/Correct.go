@@ -80,6 +80,24 @@ func (receiver correct) Datum(content any) types.StdResponse {
 	}
 }
 
+// Blank 返回空
+func (receiver correct) Blank() types.StdResponse {
+	if receiver.msg == "" {
+		receiver.msg = "OK"
+	}
+
+	return types.StdResponse{
+		MessageId:    receiver.messageId,
+		TraceId:      receiver.traceId,
+		Msg:          receiver.msg,
+		Content:      map[string]any{},
+		Status:       200,
+		ErrorCode:    0,
+		Pagination:   nil,
+		BusinessType: receiver.businessType,
+	}
+}
+
 // DataForPager 返回分页数据
 func (receiver correct) DataForPager(db *gorm.DB, read func(*gorm.DB) types.MapStringToAny) types.StdResponse {
 	var count int64

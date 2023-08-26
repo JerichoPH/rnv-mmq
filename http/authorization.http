@@ -1,4 +1,13 @@
-POST http://{{host-api}}/authorization/register
+POST {{host-api}}/authorization/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "123123"
+}
+
+### 登录
+POST {{host-api}}/authorization/register
 Content-Type: application/json
 
 {

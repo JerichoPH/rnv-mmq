@@ -58,7 +58,7 @@ func CheckAuthorization() gin.HandlerFunc {
 				wrongs.ThrowForbidden("权鉴认证方式不支持")
 			}
 
-			ctx.Set(types.CURRENT_USER, user) // 设置用户信息
+			ctx.Set(types.CurrentUser, user) // 设置用户信息
 		}
 
 		ctx.Next()

@@ -11,4 +11,5 @@ type RouterHandle struct{}
 func (RouterHandle) Register(engine *gin.Engine) {
 	NewAuthorizationRouter().Load(engine) // 权鉴
 	NewUserRouter().Load(engine)          // 用户
+	NewTaskRouter().Load(engine)          // 任务
 }

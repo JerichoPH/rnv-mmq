@@ -59,8 +59,8 @@ func (receiver authorizationRegisterForm) ShouldBind(ctx *gin.Context) authoriza
 
 // AuthorizationLoginForm 登录表单
 type AuthorizationLoginForm struct {
-	Username string `form:"account" json:"account" binding:"required"`
-	Password string `form:"password" json:"password" binding:"required"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 // ShouldBind 绑定表单
@@ -104,7 +104,7 @@ func (AuthorizationController) Register(ctx *gin.Context) {
 	bytes, _ := bcrypt.GenerateFromPassword([]byte(form.Password), 14)
 
 	// 保存新用户
-	account := &models.UserModel{
+	user := &models.UserModel{
 		GormModel: models.GormModel{Uuid: uuid.NewV4().String()},
 		Username:  form.Username,
 		Password:  string(bytes),
@@ -113,11 +113,11 @@ func (AuthorizationController) Register(ctx *gin.Context) {
 	if ret = models.NewGorm().SetModel(models.UserModel{}).
 		SetOmits(clause.Associations).
 		GetDb("").
-		Create(&account); ret.Error != nil {
-		wrongs.ThrowForbidden("创建失败：" + ret.Error.Error())
+		Create(&user); ret.Error != nil {
+		wrongs.ThrowForbidden("注册失败：" + ret.Error.Error())
 	}
 
-	ctx.JSON(tools.NewCorrectWithGinContext("注册成功", ctx).Created(types.MapStringToAny{"account": account}).ToGinResponse())
+	ctx.JSON(tools.NewCorrectWithGinContext("注册成功", ctx).Created(types.MapStringToAny{"uuid": user.Uuid}).ToGinResponse())
 }
 
 // Login 登录
@@ -132,7 +132,7 @@ func (AuthorizationController) Login(ctx *gin.Context) {
 	// 获取用户
 	ret = models.NewGorm().
 		SetModel(models.UserModel{}).
-		SetWheres(types.MapStringToAny{"user": form.Username}).
+		SetWheres(types.MapStringToAny{"username": form.Username}).
 		GetDb("").
 		First(&user)
 	wrongs.ThrowWhenIsEmpty(ret, "用户")
@@ -153,7 +153,7 @@ func (AuthorizationController) Login(ctx *gin.Context) {
 		ctx.JSON(tools.NewCorrectWithGinContext("登陆成功", ctx).Datum(types.MapStringToAny{
 			"token": token,
 			"user": types.MapStringToAny{
-				"username": user.Username,
+				"nickname": user.Nickname,
 				"uuid":     user.Uuid,
 			},
 		}).ToGinResponse())

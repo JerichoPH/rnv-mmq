@@ -26,7 +26,7 @@ type ValidateWrong struct{ Wrong }
 // ThrowValidate 421错误
 //
 //	@param text
-func ThrowValidate(text string, more ...interface{}) {
+func ThrowValidate(text string, more ...any) {
 	panic(&ValidateWrong{Wrong{ErrorMessage: fmt.Sprintf(text, more...)}})
 }
 
@@ -34,7 +34,7 @@ func ThrowValidate(text string, more ...interface{}) {
 //
 //	@param text
 //	@return error
-func ThrowEmpty(text string, more ...interface{}) {
+func ThrowEmpty(text string, more ...any) {
 	panic(&EmptyWrong{Wrong{ErrorMessage: fmt.Sprintf(text, more...)}})
 }
 
@@ -45,7 +45,7 @@ type ForbiddenWrong struct{ Wrong }
 //
 //	@param text
 //	@return error
-func ThrowForbidden(text string, more ...interface{}) {
+func ThrowForbidden(text string, more ...any) {
 	panic(&ForbiddenWrong{Wrong{ErrorMessage: fmt.Sprintf(text, more...)}})
 }
 
@@ -56,7 +56,7 @@ type UnAuthWrong struct{ Wrong }
 //
 //	@param text
 //	@return error
-func ThrowUnAuth(text string, more ...interface{}) {
+func ThrowUnAuth(text string, more ...any) {
 	panic(&UnAuthWrong{Wrong{ErrorMessage: fmt.Sprintf(text, more...)}})
 }
 
@@ -66,7 +66,7 @@ type UnLoginWrong struct{ Wrong }
 // ThrowUnLogin 未登录错误
 //
 //	@param text
-func ThrowUnLogin(text string, more ...interface{}) {
+func ThrowUnLogin(text string, more ...any) {
 	panic(&UnLoginWrong{Wrong{ErrorMessage: fmt.Sprintf(text, more...)}})
 }
 

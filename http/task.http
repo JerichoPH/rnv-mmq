@@ -1,0 +1,35 @@
+POST http://{{host-api}}/task/f6fb549c-4c06-468b-a75e-dff136d01381/cancel
+Content-Type: application/json
+Authorization: JWT {{auth-token}}
+
+{}
+
+### 取消任务
+PUT {{host-api}}/task/f6fb549c-4c06-468b-a75e-dff136d01381
+Content-Type: application/json
+Authorization: JWT {{auth-token}}
+
+{
+  "name": "测试任务",
+  "target": "B074C01",
+  "description": "测试任务A"
+}
+
+### 修改
+POST {{host-api}}/task
+Content-Type: application/json
+Authorization: JWT {{auth-token}}
+
+{
+  "name": "测试任务A",
+  "targets": [
+    "B074C01"
+  ]
+}
+
+### 新建
+GET {{host-api}}/task
+Accept: application/json
+Authorization: JWT {{auth-token}}
+
+### 任务列表

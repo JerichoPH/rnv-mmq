@@ -10,6 +10,11 @@ type (
 	}
 )
 
+// NewUserModelGorm 新建Gorm模型
+func NewUserModelGorm() *GormModel {
+	return NewGorm().SetModel(FileModel{})
+}
+
 // TableName 表名称
 func (UserModel) TableName() string {
 	return "users"

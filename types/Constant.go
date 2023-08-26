@@ -8,7 +8,7 @@ const FormatYear = "2006"
 const FormatHourMinute = "15:04"
 const FormatHour = "15"
 
-const CURRENT_USER = "__CURRENT-USER__"
+const CurrentUser = "__CURRENT-USER__"
 
 const Original = "ORIGINAL"
 const Finished = "FINISHED"

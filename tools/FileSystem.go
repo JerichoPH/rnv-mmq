@@ -53,7 +53,7 @@ func (receiver FileSystem) ReadString() string {
 }
 
 // ReadJson 读取json文件
-func (receiver FileSystem) ReadJson() interface{} {
+func (receiver FileSystem) ReadJson() any {
 	f, err := ioutil.ReadFile(receiver.path)
 	if err != nil {
 		wrongs.ThrowForbidden("文件读取失败:", err.Error())

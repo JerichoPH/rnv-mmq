@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
-	"log"
 	"rnv-mmq/models"
 	"rnv-mmq/services"
 	"rnv-mmq/tools"
@@ -75,18 +74,15 @@ func (TaskController) Store(ctx *gin.Context) {
 	// 表单
 	form := (&TaskStoreForm{}).ShouldBind(ctx)
 
-	wrongs.ThrowWhenIsRepeat(ret, "任务名称")
-
 	// 新建
 	tasks = make([]*models.TaskModel, len(form.Targets))
 	for idx, target := range form.Targets {
-		log.Println(target)
 		tasks[idx] = &models.TaskModel{
-			GormModel: models.GormModel{Uuid: uuid.NewV4().String()},
-			Name:      form.Name,
-			// Target:      target,
-			// Description: form.Description,
-			StatusCode: "ORIGINAL",
+			GormModel:   models.GormModel{Uuid: uuid.NewV4().String()},
+			Name:        form.Name,
+			Target:      target,
+			Description: form.Description,
+			StatusCode:  models.TaskModelStatusCodeOriginal,
 		}
 	}
 	if ret = models.NewGorm().
@@ -102,17 +98,23 @@ func (TaskController) Store(ctx *gin.Context) {
 // Delete 删除
 func (TaskController) Delete(ctx *gin.Context) {
 	var (
-		ret  *gorm.DB
-		task models.TaskModel
+		ret        *gorm.DB
+		task       models.TaskModel
+		canIDelete = false
+		reason     string
 	)
 
 	// 查询
-	ret = models.NewGorm().
-		SetModel(models.TaskModel{}).
+	ret = models.NewTaskModelGorm().
 		GetDb("").
 		Where("uuid = ?", ctx.Param("uuid")).
 		First(&task)
 	wrongs.ThrowWhenIsEmpty(ret, "任务")
+
+	// 判断任务是否可删除
+	if canIDelete, reason = task.CanIDelete(); !canIDelete {
+		wrongs.ThrowForbidden(reason)
+	}
 
 	// 删除
 	if ret := models.NewGorm().
@@ -146,8 +148,8 @@ func (TaskController) Update(ctx *gin.Context) {
 
 	// 编辑
 	task.Name = form.Name
-	// task.Target = form.Target
-	// task.Description = form.Description
+	task.Target = form.Target
+	task.Description = form.Description
 	if ret = models.NewGorm().
 		SetModel(models.TaskModel{}).
 		GetDb("").
@@ -212,4 +214,152 @@ func (receiver TaskController) ListJdt(ctx *gin.Context) {
 			).
 			ToGinResponse(),
 	)
+}
+
+// PostProcess 标记执行
+func (TaskController) PostProcess(ctx *gin.Context) {
+	var (
+		task        *models.TaskModel
+		ret         *gorm.DB
+		canIProcess = false
+		reason      string
+	)
+
+	ret = models.NewTaskModelGorm().GetDb("").Where("uuid = ?", ctx.Param("uuid")).First(&task)
+	wrongs.ThrowWhenIsEmpty(ret, "任务")
+
+	// 判断任务是否可以【标记执行】
+	if canIProcess, reason = task.CanIProcess(); !canIProcess {
+		wrongs.ThrowForbidden(reason)
+	}
+
+	// 执行任务
+	task.StatusCode = models.TaskModelStatusCodeProcessing
+	if ret = models.NewTaskModelGorm().GetDb("").Where("uuid = ?", task.Uuid).Save(&task); ret.Error != nil {
+		wrongs.ThrowForbidden("【标记执行】失败：%s", ret.Error.Error())
+	}
+
+	// 写入执行日志
+	if ret = models.NewTaskLogModelGorm().GetDb("").Create(&models.TaskLogModel{
+		GormModel: models.GormModel{Uuid: uuid.NewV4().String()},
+		Name:      "执行",
+		TaskUuid:  task.Uuid,
+	}); ret.Error != nil {
+		wrongs.ThrowForbidden("写入【标记执行】日志失败：%s", ret.Error.Error())
+	}
+
+	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Blank().ToGinResponse())
+}
+
+// PostFinish 标记完成
+func (receiver TaskController) PostFinish(ctx *gin.Context) {
+	var (
+		task       *models.TaskModel
+		ret        *gorm.DB
+		canIFinish = false
+		reason     string
+	)
+
+	ret = models.NewTaskModelGorm().GetDb("").Where("uuid = ?", ctx.Param("uuid")).First(&task)
+	wrongs.ThrowWhenIsEmpty(ret, "任务")
+
+	// 判断任务是否可以【标记完成】
+	if canIFinish, reason = task.CanIFinish(); !canIFinish {
+		wrongs.ThrowForbidden(reason)
+	}
+
+	// 执行任务
+	task.StatusCode = models.TaskModelStatusCodeFinished
+	if ret = models.NewTaskModelGorm().GetDb("").Where("uuid = ?", task.Uuid).Save(&task); ret.Error != nil {
+		wrongs.ThrowForbidden("【标记完成】失败：%s", ret.Error.Error())
+	}
+
+	// 写入执行日志
+	if ret = models.NewTaskLogModelGorm().GetDb("").Create(&models.TaskLogModel{
+		GormModel: models.GormModel{Uuid: uuid.NewV4().String()},
+		Name:      "完成",
+		TaskUuid:  task.Uuid,
+	}); ret.Error != nil {
+		wrongs.ThrowForbidden("写入【标记完成】日志失败：%s", ret.Error.Error())
+	}
+
+	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Blank().ToGinResponse())
+}
+
+// PostFail 标记失败
+func (receiver TaskController) PostFail(ctx *gin.Context) {
+	var (
+		task     *models.TaskModel
+		ret      *gorm.DB
+		canIFail = false
+		reason   string
+	)
+
+	ret = models.
+		NewTaskModelGorm().
+		GetDb("").
+		Where("uuid = ?", ctx.Param("uuid")).
+		First(&task)
+	wrongs.ThrowWhenIsEmpty(ret, "任务")
+
+	// 判断任务是否可以【标记失败】
+	if canIFail, reason = task.CanIFail(); !canIFail {
+		wrongs.ThrowForbidden(reason)
+	}
+
+	// 取消任务
+	task.StatusCode = models.TaskModelStatusCodeFailed
+	if ret = models.NewTaskModelGorm().GetDb("").Where("uuid = ?", task.Uuid).Save(&task); ret.Error != nil {
+		wrongs.ThrowForbidden("【标记失败】失败：%s", ret.Error.Error())
+	}
+
+	// 写入执行日志
+	if ret = models.NewTaskLogModelGorm().GetDb("").Create(&models.TaskLogModel{
+		GormModel: models.GormModel{Uuid: uuid.NewV4().String()},
+		Name:      "失败",
+		TaskUuid:  task.Uuid,
+	}); ret.Error != nil {
+		wrongs.ThrowForbidden("写入【标记失败】日志失败：%s", ret.Error.Error())
+	}
+
+	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Blank().ToGinResponse())
+}
+
+// PostCancel 标记取消
+func (TaskController) PostCancel(ctx *gin.Context) {
+	var (
+		task       *models.TaskModel
+		ret        *gorm.DB
+		canICancel = false
+		reason     string
+	)
+
+	ret = models.
+		NewTaskModelGorm().
+		GetDb("").
+		Where("uuid = ?", ctx.Param("uuid")).
+		First(&task)
+	wrongs.ThrowWhenIsEmpty(ret, "任务")
+
+	// 判断任务是否可以【标记取消】
+	if canICancel, reason = task.CanICancel(); !canICancel {
+		wrongs.ThrowForbidden(reason)
+	}
+
+	// 取消任务
+	task.StatusCode = models.TaskModelStatusCodeCancel
+	if ret = models.NewTaskModelGorm().GetDb("").Where("uuid = ?", task.Uuid).Save(&task); ret.Error != nil {
+		wrongs.ThrowForbidden("【标记取消】失败：%s", ret.Error.Error())
+	}
+
+	// 写入执行日志
+	if ret = models.NewTaskLogModelGorm().GetDb("").Create(&models.TaskLogModel{
+		GormModel: models.GormModel{Uuid: uuid.NewV4().String()},
+		Name:      "取消",
+		TaskUuid:  task.Uuid,
+	}); ret.Error != nil {
+		wrongs.ThrowForbidden("写入【标记取消】日志失败：%s", ret.Error.Error())
+	}
+
+	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Blank().ToGinResponse())
 }
