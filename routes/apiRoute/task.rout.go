@@ -32,13 +32,13 @@ func (TaskRouter) Load(engine *gin.Engine) {
 		taskRoute.GET("", controllers.NewTaskController().List)
 		// jquery-dataTable数据列表
 		taskRoute.GET(".jdt", controllers.NewTaskController().ListJdt)
-		// 执行
+		// 标记执行
 		taskRoute.POST("/:uuid/process", controllers.NewTaskController().PostProcess)
-		// 执行
+		// 标记完成
 		taskRoute.POST("/:uuid/finish", controllers.NewTaskController().PostFinish)
-		// 失败
-		taskRoute.POST("/:uuid/fail", controllers.NewTaskController().PostFinish)
-		// 取消
+		// 标记失败
+		taskRoute.POST("/:uuid/fail", controllers.NewTaskController().PostFail)
+		// 标记取消
 		taskRoute.POST("/:uuid/cancel", controllers.NewTaskController().PostCancel)
 	}
 
