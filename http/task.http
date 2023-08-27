@@ -45,12 +45,19 @@ Authorization: JWT {{auth-token}}
   "name": "测试任务A",
   "targets": [
     "B074C01"
-  ]
+  ],
+  "content": "{\"name\":\"张三\"}",
+  "business_type": "equipmentKinds"
 }
 
 ### 新建
+GET {{host-api}}/task/452670af-d492-4aba-a073-22518b6d462c?__preloads__[]=ContentFile
+Accept: application/json
+Authorization: JWT {{auth-token}}
+
+### 详情
 GET {{host-api}}/task
 Accept: application/json
 Authorization: JWT {{auth-token}}
 
-### 任务列表
+### 列表

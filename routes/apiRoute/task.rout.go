@@ -25,7 +25,7 @@ func (TaskRouter) Load(engine *gin.Engine) {
 		// 删除
 		taskRoute.DELETE("/:uuid", controllers.NewTaskController().Delete)
 		// 编辑
-		taskRoute.PUT("/:uuid", controllers.NewTaskController().Update)
+		// taskRoute.PUT("/:uuid", controllers.NewTaskController().Update)
 		// 详情
 		taskRoute.GET("/:uuid", controllers.NewTaskController().Detail)
 		// 列表

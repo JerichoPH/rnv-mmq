@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
+	"log"
 	"rnv-mmq/models"
 	"rnv-mmq/services"
 	"rnv-mmq/tools"
@@ -14,9 +15,11 @@ type (
 	TaskController struct{}
 	// TaskStoreForm 任务表单（新建）
 	TaskStoreForm struct {
-		Name        string   `json:"name"`
-		Targets     []string `json:"targets"`
-		Description string   `json:"description"`
+		Name         string   `json:"name"`
+		Targets      []string `json:"targets"`
+		Description  string   `json:"description"`
+		Content      string   `json:"content"`
+		BusinessType string   `json:"business_type"`
 	}
 	// TaskUpdateForm 任务表单（修改）
 	TaskUpdateForm struct {
@@ -37,6 +40,12 @@ func (receiver TaskStoreForm) ShouldBind(ctx *gin.Context) TaskStoreForm {
 	}
 	if len(receiver.Targets) == 0 {
 		wrongs.ThrowValidate("任务目标必填")
+	}
+	if receiver.Content == "" {
+		wrongs.ThrowValidate("任务内容不能为空")
+	}
+	if receiver.BusinessType == "" {
+		wrongs.ThrowForbidden("业务类型不能为空")
 	}
 
 	return receiver
@@ -66,30 +75,57 @@ func NewTaskController() *TaskController {
 // Store 新建
 func (TaskController) Store(ctx *gin.Context) {
 	var (
-		ret   *gorm.DB
-		tasks []*models.TaskModel
+		ret         *gorm.DB
+		tasks       []*models.TaskModel
+		taskLogs    []*models.TaskLogModel
+		contentFile *models.FileModel
 	)
 
 	// 表单
 	form := (&TaskStoreForm{}).ShouldBind(ctx)
 
-	// 新建
+	// 保存请求内容到文件
+	contentFile = &models.FileModel{
+		GormModel:         models.GormModel{Uuid: uuid.NewV4().String()},
+		OriginalExtension: ".json",
+		Size:              uint64(len(form.Content)),
+		FileType:          models.FileTypeJson,
+		PrefixPath:        "tasks-content",
+	}
+	contentFile = new(models.FileModel).StoreOne(contentFile, form.Content)
+
+	// 新建任务
 	tasks = make([]*models.TaskModel, len(form.Targets))
 	for idx, target := range form.Targets {
 		tasks[idx] = &models.TaskModel{
-			GormModel:   models.GormModel{Uuid: uuid.NewV4().String()},
-			Name:        form.Name,
-			Target:      target,
-			Description: form.Description,
-			StatusCode:  models.TaskModelStatusCodeOriginal,
+			GormModel:       models.GormModel{Uuid: uuid.NewV4().String()},
+			Name:            form.Name,
+			Target:          target,
+			Description:     form.Description,
+			StatusCode:      models.TaskModelStatusCodeOriginal,
+			ContentFileUuid: contentFile.Uuid,
+			BusinessType:    form.BusinessType,
 		}
 	}
-	if ret = models.NewGorm().
-		SetModel(models.TaskModel{}).
-		GetDb("").
-		Create(&tasks); ret.Error != nil {
-		wrongs.ThrowForbidden(ret.Error.Error())
+	if ret = models.NewTaskModelGorm().GetDb("").Create(&tasks); ret.Error != nil {
+		wrongs.ThrowForbidden("保存任务失败：%s", ret.Error.Error())
 	}
+
+	// 保存任务日志
+	taskLogs = make([]*models.TaskLogModel, len(form.Targets))
+	for idx, task := range tasks {
+		taskLogs[idx] = &models.TaskLogModel{
+			GormModel:    models.GormModel{Uuid: uuid.NewV4().String()},
+			Name:         "新建",
+			TaskUuid:     task.Uuid,
+			BusinessType: task.BusinessType,
+		}
+	}
+	if ret = models.NewTaskLogModelGorm().GetDb("").Create(taskLogs); ret.Error != nil {
+		wrongs.ThrowForbidden("写入【任务日志】失败：%s", ret.Error.Error())
+	}
+
+	log.Println(taskLogs)
 
 	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Created(map[string]any{"tasks": tasks}).ToGinResponse())
 }
@@ -125,39 +161,6 @@ func (TaskController) Delete(ctx *gin.Context) {
 	}
 
 	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Deleted().ToGinResponse())
-}
-
-// Update 编辑
-func (TaskController) Update(ctx *gin.Context) {
-	var (
-		ret  *gorm.DB
-		task models.TaskModel
-	)
-
-	// 表单
-	form := TaskUpdateForm{}.ShouldBind(ctx)
-
-	// 查询
-	ret = models.NewGorm().
-		SetModel(models.TaskModel{}).
-		GetDb("").
-		Where("uuid = ?", ctx.Param("uuid")).
-		First(&task)
-	wrongs.ThrowWhenIsEmpty(ret, "任务")
-
-	// 编辑
-	task.Name = form.Name
-	task.Target = form.Target
-	task.Description = form.Description
-	if ret = models.NewGorm().
-		SetModel(models.TaskModel{}).
-		GetDb("").
-		Where("uuid = ?", ctx.Param("uuid")).
-		Save(&task); ret.Error != nil {
-		wrongs.ThrowForbidden(ret.Error.Error())
-	}
-
-	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Updated(map[string]any{"task": task}).ToGinResponse())
 }
 
 // Detail 详情

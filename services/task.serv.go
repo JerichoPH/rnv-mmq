@@ -21,7 +21,7 @@ func NewTaskService(baseService BaseService) *TaskService {
 // GetListByQuery 根据Query获取列表
 func (receiver TaskService) GetListByQuery() *gorm.DB {
 	return (receiver.Model).
-		SetWheresEqual("name", "target", "file_uuid").
+		SetWheresEqual("name", "target", "content_file_uuid").
 		SetWheresFuzzy(map[string]string{ // 模糊查询字段
 			"description": "description like ?",
 		}).
@@ -30,13 +30,13 @@ func (receiver TaskService) GetListByQuery() *gorm.DB {
 			"targets[]": func(values []string, db *gorm.DB) *gorm.DB {
 				return db.Where("target in ?", values)
 			},
-			"file_uuids[]": func(strings []string, db *gorm.DB) *gorm.DB {
-				return db.Where("file_uuid in ?", strings)
+			"content_file_uuids[]": func(strings []string, db *gorm.DB) *gorm.DB {
+				return db.Where("content_file_uuid in ?", strings)
 			},
 		}).
 		SetCtx(receiver.Ctx).
 		GetDbUseQuery("").
-		Table(fmt.Sprintf("%s as t", models.TaskModel{}.TableName()))
+		Table(fmt.Sprintf("%s as t", new(models.TaskModel).TableName()))
 }
 
 // NewTaskLogService 构造函数
@@ -59,5 +59,5 @@ func (receiver TaskLogService) GetListByQuery() *gorm.DB {
 		}).
 		SetCtx(receiver.Ctx).
 		GetDbUseQuery("").
-		Table(fmt.Sprintf("%s as tl", models.TaskLogModel{}.TableName()))
+		Table(fmt.Sprintf("%s as tl", new(models.TaskLogModel).TableName()))
 }
