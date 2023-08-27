@@ -1,14 +1,15 @@
 package controllers
 
 import (
-	"github.com/gin-gonic/gin"
-	uuid "github.com/satori/go.uuid"
-	"gorm.io/gorm"
 	"log"
 	"rnv-mmq/models"
 	"rnv-mmq/services"
 	"rnv-mmq/tools"
 	"rnv-mmq/wrongs"
+
+	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
 )
 
 type (
@@ -82,7 +83,7 @@ func (TaskController) Store(ctx *gin.Context) {
 	)
 
 	// 表单
-	form := (&TaskStoreForm{}).ShouldBind(ctx)
+	form := TaskStoreForm{}.ShouldBind(ctx)
 
 	// 保存请求内容到文件
 	contentFile = &models.FileModel{
@@ -184,6 +185,10 @@ func (TaskController) listUseQuery(ctx *gin.Context) *gorm.DB {
 	return services.NewTaskService(services.BaseService{Model: models.NewGorm().SetModel(models.TaskModel{}), Ctx: ctx}).GetListByQuery()
 }
 
+func (TaskController) listUsePostJson(ctx *gin.Context) *gorm.DB {
+	return services.NewTaskService(services.BaseService{Model: models.NewTaskModelGorm(), Ctx: ctx}).GetListByPostParam()
+}
+
 // List 列表
 func (receiver TaskController) List(ctx *gin.Context) {
 	var tasks []*models.TaskModel
@@ -191,7 +196,7 @@ func (receiver TaskController) List(ctx *gin.Context) {
 	ctx.JSON(
 		tools.NewCorrectWithGinContext("", ctx).
 			DataForPager(
-				receiver.listUseQuery(ctx),
+				receiver.listUsePostJson(ctx),
 				func(db *gorm.DB) map[string]any {
 					db.Find(&tasks)
 					return map[string]any{"tasks": tasks}
@@ -208,7 +213,7 @@ func (receiver TaskController) ListJdt(ctx *gin.Context) {
 	ctx.JSON(
 		tools.NewCorrectWithGinContext("", ctx).
 			DataForJqueryDataTable(
-				receiver.listUseQuery(ctx),
+				receiver.listUsePostJson(ctx),
 				func(db *gorm.DB) map[string]any {
 					db.Find(&tasks)
 					return map[string]any{"tasks": tasks}
@@ -218,8 +223,8 @@ func (receiver TaskController) ListJdt(ctx *gin.Context) {
 	)
 }
 
-// PostProcess 标记执行
-func (TaskController) PostProcess(ctx *gin.Context) {
+// Process 标记执行
+func (TaskController) Process(ctx *gin.Context) {
 	var (
 		task        *models.TaskModel
 		ret         *gorm.DB
@@ -253,8 +258,8 @@ func (TaskController) PostProcess(ctx *gin.Context) {
 	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Blank().ToGinResponse())
 }
 
-// PostFinish 标记完成
-func (TaskController) PostFinish(ctx *gin.Context) {
+// Finish 标记完成
+func (TaskController) Finish(ctx *gin.Context) {
 	var (
 		task       *models.TaskModel
 		ret        *gorm.DB
@@ -288,8 +293,8 @@ func (TaskController) PostFinish(ctx *gin.Context) {
 	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Blank().ToGinResponse())
 }
 
-// PostFail 标记失败
-func (TaskController) PostFail(ctx *gin.Context) {
+// Fail 标记失败
+func (TaskController) Fail(ctx *gin.Context) {
 	var (
 		task     *models.TaskModel
 		ret      *gorm.DB
@@ -327,8 +332,8 @@ func (TaskController) PostFail(ctx *gin.Context) {
 	ctx.JSON(tools.NewCorrectWithGinContext("", ctx).Blank().ToGinResponse())
 }
 
-// PostCancel 标记取消
-func (TaskController) PostCancel(ctx *gin.Context) {
+// Cancel 标记取消
+func (TaskController) Cancel(ctx *gin.Context) {
 	var (
 		task       *models.TaskModel
 		ret        *gorm.DB

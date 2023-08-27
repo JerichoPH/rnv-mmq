@@ -26,17 +26,6 @@ Authorization: JWT {{auth-token}}
 {}
 
 ### 标记执行
-PUT {{host-api}}/task/f6fb549c-4c06-468b-a75e-dff136d01381
-Content-Type: application/json
-Authorization: JWT {{auth-token}}
-
-{
-  "name": "测试任务",
-  "target": "B074C01",
-  "description": "测试任务A"
-}
-
-### 修改
 POST {{host-api}}/task
 Content-Type: application/json
 Authorization: JWT {{auth-token}}
@@ -51,13 +40,25 @@ Authorization: JWT {{auth-token}}
 }
 
 ### 新建
-GET {{host-api}}/task/452670af-d492-4aba-a073-22518b6d462c?__preloads__[]=ContentFile
-Accept: application/json
+POST {{host-api}}/task/452670af-d492-4aba-a073-22518b6d462c/detail
+Content-Type: application/json
 Authorization: JWT {{auth-token}}
 
+{
+  "preloads": [
+    "ContentFile"
+  ]
+}
+
 ### 详情
-GET {{host-api}}/task?__preloads__[]=ContentFile
-Accept: application/json
+POST {{host-api}}/task/list
+Content-Type: application/json
 Authorization: JWT {{auth-token}}
+
+{
+  "preloads": [
+    "ContentFile"
+  ]
+}
 
 ### 列表

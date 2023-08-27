@@ -1,9 +1,10 @@
 package apiRoute
 
 import (
-	"github.com/gin-gonic/gin"
 	"rnv-mmq/controllers"
 	"rnv-mmq/middlewares"
+
+	"github.com/gin-gonic/gin"
 )
 
 // TaskRouter 路由
@@ -21,25 +22,25 @@ func (TaskRouter) Load(engine *gin.Engine) {
 	)
 	{
 		// 新建
-		taskRoute.POST("", controllers.NewTaskController().Store)
+		taskRoute.POST("store", controllers.NewTaskController().Store)
 		// 删除
-		taskRoute.DELETE("/:uuid", controllers.NewTaskController().Delete)
+		taskRoute.POST("/:uuid/delete", controllers.NewTaskController().Delete)
 		// 编辑
 		// taskRoute.PUT("/:uuid", controllers.NewTaskController().Update)
 		// 详情
-		taskRoute.GET("/:uuid", controllers.NewTaskController().Detail)
+		taskRoute.POST("/:uuid/detail", controllers.NewTaskController().Detail)
 		// 列表
-		taskRoute.GET("", controllers.NewTaskController().List)
+		taskRoute.POST("list", controllers.NewTaskController().List)
 		// jquery-dataTable数据列表
-		taskRoute.GET(".jdt", controllers.NewTaskController().ListJdt)
+		taskRoute.POST("list.jdt", controllers.NewTaskController().ListJdt)
 		// 标记执行
-		taskRoute.POST("/:uuid/process", controllers.NewTaskController().PostProcess)
+		taskRoute.POST("/:uuid/process", controllers.NewTaskController().Process)
 		// 标记完成
-		taskRoute.POST("/:uuid/finish", controllers.NewTaskController().PostFinish)
+		taskRoute.POST("/:uuid/finish", controllers.NewTaskController().Finish)
 		// 标记失败
-		taskRoute.POST("/:uuid/fail", controllers.NewTaskController().PostFail)
+		taskRoute.POST("/:uuid/fail", controllers.NewTaskController().Fail)
 		// 标记取消
-		taskRoute.POST("/:uuid/cancel", controllers.NewTaskController().PostCancel)
+		taskRoute.POST("/:uuid/cancel", controllers.NewTaskController().Cancel)
 	}
 
 	taskLogRoute := engine.Group(
