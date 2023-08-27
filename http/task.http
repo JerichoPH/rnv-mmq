@@ -56,7 +56,7 @@ Accept: application/json
 Authorization: JWT {{auth-token}}
 
 ### 详情
-GET {{host-api}}/task
+GET {{host-api}}/task?__preloads__[]=ContentFile
 Accept: application/json
 Authorization: JWT {{auth-token}}
 

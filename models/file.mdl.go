@@ -19,7 +19,7 @@ type (
 		FileType          FileType    `gorm:"type:varchar(128);not null;default:'';comment:文件类型" json:"file_type,omitempty"`
 		PrefixPath        string      `gorm:"type:varchar(128);not null;default:'';comment:文件前缀路径" json:"prefix_path,omitempty"`
 		Tasks             []TaskModel `gorm:"foreignKey:content_file_uuid;references:uuid;comment:相关任务（请求）" json:"tasks,omitempty"`
-		Content           string      `gorm:"-" json:"content,omitempty"`
+		Content           any         `gorm:"-" json:"content,omitempty"`
 		Url               string      `gorm:"-" json:"url,omitempty"`
 	}
 
@@ -89,7 +89,7 @@ func (receiver *FileModel) AfterFind(tx *gorm.DB) (err error) {
 		case FileTypeJson:
 			receiver.Content = tools.NewFileSystem(
 				tools.JoinWithoutEmpty([]string{"./static", receiver.PrefixPath, receiver.Filename}, "/"),
-			).ReadString()
+			).ReadJson()
 		case FileTypeText:
 			receiver.Content = tools.NewFileSystem(
 				tools.JoinWithoutEmpty([]string{"./static", receiver.PrefixPath, receiver.Filename}, "/"),

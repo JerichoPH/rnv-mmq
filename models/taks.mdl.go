@@ -12,7 +12,6 @@ type (
 		BusinessType    string               `gorm:"type:varchar(128);not null;default:'';comment:业务类型;" json:"business_type,omitempty"`
 		ContentFileUuid string               `gorm:"index;type:char(36);not null;comment:所属请求文件uuid" json:"content_file_uuid,omitempty"`
 		ContentFile     *FileModel           `gorm:"foreignKey:content_file_uuid;references:uuid;comment:所属文件;" json:"content_file,omitempty"`
-		Content         string               `gorm:"-" json:"content,omitempty"`
 		TaskLogs        []*TaskLogModel      `gorm:"foreignKey:task_uuid;references:uuid;comment:相关任务日志;" json:"task_logs,omitempty"`
 	}
 
